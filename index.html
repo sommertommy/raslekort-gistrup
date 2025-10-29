@@ -13,6 +13,7 @@
       padding: 10px 12px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
       font-size: 14px; line-height: 1.35; max-width: 320px;
+      .panel { z-index: 1000; }
     }
     .panel h1 { margin: 0 0 6px; font-size: 16px; }
     .cta { display:inline-block; background:#ff7a00; color:#fff; padding:6px 10px; border-radius:6px; text-decoration:none; margin-right:6px; margin-top:8px;}
@@ -53,9 +54,9 @@
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
     // ←←← INDSÆT dine links her
-    const FEED_URL = 'PASTE_YOUR_APPS_SCRIPT_WEBAPP_URL_HER';
-    const FORM_URL = 'PASTE_DIT_GOOGLE_FORM_LINK_HER';
-    const REMOVE_FORM_URL = 'PASTE_DIT_FJERN_FORM_LINK_HER';
+    const FEED_URL = 'https://script.google.com/macros/s/AKfycbw8BlGt-94Ysnpd44OzL6KveRq6VxWKyBXNoiz9utH7LVSbHyHRvKdv4FcJdisk5BvBSA/exec';
+    const FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSfg4x6cGMv1V821kLQDGjqM-rRMu-TD6AzFZvKZ7BTnTARgrQ/viewform?usp=dialog';
+    const REMOVE_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSfEOyKIBv6Mp76qa0BGFTBSeetSxjQyWOqDx9gN9wje0Sj1Lg/viewform?usp=dialog';
 
     // Gistrup center og "hegn" (ca. bbox)
     // BBOX format: [[sydvest_lat, sydvest_lng], [nordøst_lat, nordøst_lng]]
@@ -65,6 +66,8 @@
     const map = L.map('map', { worldCopyJump: false }).setView(CENTER, 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
+      noWrap: true,           // ← vigtigt
+      continuousWorld: false, // ← ekstra sikkerhed
       attribution: '&copy; OpenStreetMap-bidragsydere'
     }).addTo(map);
 
