@@ -288,14 +288,19 @@
     const fab   = document.getElementById('fab');
     const minBtn = document.getElementById('minimizeBtn');
 
+    const locateBtn = document.getElementById('locateBtn');
+
     function minimizePanel() {
       panel.style.display = 'none';
       fab.style.display = 'flex';
+      locateBtn.style.display = 'block'; // vis knappen igen
       fab.focus();
     }
+    
     function expandPanel() {
       fab.style.display = 'none';
       panel.style.display = 'block';
+      locateBtn.style.display = 'none'; // skjul "Find mig" når panel er åbent
       minBtn.focus();
     }
     minBtn.addEventListener('click', minimizePanel);
@@ -308,6 +313,7 @@
     //  expandPanel();
     //}
     expandPanel();
+    locateBtn.style.display = 'none';
     
   </script>
 </body>
