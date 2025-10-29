@@ -182,28 +182,37 @@
     }
 
     // Hent markører (uden auto-zoom)
-    async function loadMarkers() {
-      try {
-        const geo = await jsonp(FEED_URL);
-        L.geoJSON(geo, {
-          pointToLayer: (feature, latlng) => L.marker(latlng, { icon: new PumpkinIcon() }),
-          onEachFeature: (feature, marker) => {
-            const p = feature.properties || {};
-            const whenRaw = p.tidspunkt && String(p.tidspunkt).trim();
-            const whenTxt = whenRaw ? formatWhen(whenRaw) : '';
-            const html = `
-              <strong>${escapeHtml(p.adresse || 'Adresse')}</strong><br/>
-              ${whenTxt ? `⏰ Indtil ${escapeHtml(whenTxt)}<br/>` : ''}
-              ${p.note ? `📝 ${escapeHtml(p.note)}` : ''}
-            `;
-            marker.bindPopup(html);
+   let markerLayer = null; // global variabel til at holde styr på laget
+
+      async function loadMarkers() {
+        try {
+          const geo = await jsonp(FEED_URL);
+      
+          // Fjern gamle markører før vi tilføjer nye
+          if (markerLayer) {
+            map.removeLayer(markerLayer);
           }
-        }).addTo(map);
-      } catch (e) {
-        console.error(e);
-        alert('Kunne ikke hente kortdata (prøv at opdatere siden).');
+      
+          markerLayer = L.geoJSON(geo, {
+            pointToLayer: (feature, latlng) => L.marker(latlng, { icon: new PumpkinIcon() }),
+            onEachFeature: (feature, marker) => {
+              const p = feature.properties || {};
+              const whenRaw = p.tidspunkt && String(p.tidspunkt).trim();
+              const whenTxt = whenRaw ? formatWhen(whenRaw) : '';
+              const html = `
+                <strong>${escapeHtml(p.adresse || 'Adresse')}</strong><br/>
+                ${whenTxt ? `⏰ Indtil ${escapeHtml(whenTxt)}<br/>` : ''}
+                ${p.note ? `📝 ${escapeHtml(p.note)}` : ''}
+              `;
+              marker.bindPopup(html);
+            }
+          }).addTo(map);
+      
+        } catch (e) {
+          console.error(e);
+          alert('Kunne ikke hente kortdata (prøv at opdatere siden).');
+        }
       }
-    }
 
     function formatWhen(raw) {
       if (!raw) return '';
@@ -290,8 +299,10 @@
 
     // Valgfrit: start minimeret på små skærme
     //if (window.matchMedia('(max-width: 600px)').matches) {
-    //minimizePanel();
-    // Start altid åben – også på mobil
+    //  minimizePanel();
+    //  // Start altid åben – også på mobil
+    //  expandPanel();
+    //}
     expandPanel();
     }
   </script>
