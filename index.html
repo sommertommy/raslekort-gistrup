@@ -35,21 +35,54 @@
     .cta { display:inline-block; background:#ff7a00; color:#fff; padding:8px 12px; border-radius:10px; text-decoration:none; margin-right:6px; margin-top:8px; font-weight:600; }
     .cta.secondary { background:#444; }
     .panel-header {
-      display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:6px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
       font-weight:700;
+      margin-bottom:6px;
     }
+    
+    /* 🔸 Luk / kryds-knap */
     .panel-min-btn {
-      border:none; background:transparent; font-size:20px; line-height:1; cursor:pointer; padding:4px; color:#444;
+      border:none;
+      background:transparent;
+      font-size:20px;
+      line-height:1;
+      cursor:pointer;
+      padding:4px 8px;
+      color:#ff7a00;
+      border-radius:6px;
+      transition: all 0.15s ease;
+    }
+    .panel-min-btn:hover {
+      background:#fff3e6;
+      transform: rotate(90deg);
     }
 
     /* FAB (minimeret til rund + knap) */
     .fab {
-      position: absolute; right: 12px; bottom: 12px; width: 56px; height: 56px;
-      border-radius: 50%; background: #ff7a00; color:#fff; display:none; align-items:center; justify-content:center;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.25); cursor:pointer; z-index:1000; font-size:28px; user-select:none;
+      position: absolute;
+      right: 12px;
+      bottom: 12px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: #ff7a00;
+      color:#fff;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+      cursor:pointer;
+      z-index:1000;
+      font-size:28px;
+      user-select:none;
+      border:none;
+      transition: background 0.2s ease;
     }
-    .fab:focus, .panel-min-btn:focus { outline: 2px solid #ffb36b; outline-offset: 2px; }
-
+    .fab:hover { background:#ff8e2b; }
+    
     .locate-btn {
       position:absolute; right:12px; top:12px; z-index:1000;
       background:#fff; border:1px solid #ccc; border-radius:10px; padding:8px 12px; cursor:pointer;
@@ -81,7 +114,7 @@
   <div id="ctaPanel" class="panel" role="dialog" aria-label="Tilmeld adresse panel">
     <div class="panel-header">
       <span>Raslekort – Gistrup (9260)</span>
-      <button id="minimizeBtn" class="panel-min-btn" aria-label="Minimer">—</button>
+      <button id="minimizeBtn" class="panel-min-btn" aria-label="Minimer">×</button>
     </div>
     <div class="row">Sæt et græskar ved døren – og tilmeld din adresse. Kun adresser i <strong>9260 Gistrup</strong> vises.</div>
     <div id="btns" class="row"></div>
