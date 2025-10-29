@@ -4,13 +4,48 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Her kan du rasle 🎃 – Gistrup (9260)</title>
+
+  <!-- Favicon (læg pump.png i samme mappe som index.html) -->
+  <link rel="icon" type="image/png" href="pump.png" />
+  <link rel="apple-touch-icon" href="pump.png" />
+
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <style>
     html, body { height: 100%; margin: 0; }
-    #map { height: 100vh; }
+    /* Flex-layout: topbar øverst, map fylder resten */
+    body { display: flex; flex-direction: column; }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      background: #fff;
+      border-bottom: 1px solid #eee;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    }
+    .topbar img.logo {
+      height: 56px;
+      width: auto;
+      display: block;
+    }
+    .topbar .title {
+      display: flex; flex-direction: column;
+      line-height: 1.1;
+    }
+    .topbar .title .big {
+      font-size: 22px; font-weight: 800; color: #ff7a00; letter-spacing: 0.5px;
+    }
+    .topbar .title .small {
+      font-size: 13px; color: #444;
+    }
+
+    /* Kortet fylder resten af højden */
+    #map { flex: 1 1 auto; min-height: 60vh; }
 
     .panel {
-      position: absolute; top: 10px; left: 10px; background: #fff; 
+      position: absolute; top: 10px; left: 10px; background: #fff;
       padding: 10px 12px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
       font-size: 14px; line-height: 1.35; max-width: 320px; z-index:1000;
@@ -42,8 +77,21 @@
   </style>
 </head>
 <body>
+
+  <!-- Header/hero øverst -->
+  <div class="topbar">
+    <!-- Læg halloween.png i samme mappe som index.html -->
+    <img src="halloween.png" alt="Halloween" class="logo" />
+    <div class="title">
+      <div class="big">HALLOWEEN – Gistrup</div>
+      <div class="small">Kortet over steder hvor man må rasle 🎃</div>
+    </div>
+  </div>
+
+  <!-- Selve kortet -->
   <div id="map"></div>
 
+  <!-- Overlay-panel -->
   <div class="panel">
     <h1>Her kan du rasle 🎃 – Gistrup (9260)</h1>
     <div>🔸 Sæt et græskar ved døren – og tilmeld din adresse på knappen herunder. Kun adresser i <strong>9260 Gistrup</strong> vises.</div>
@@ -58,20 +106,19 @@
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
-    // 🔗 INDSÆT DINE LINKS HER
-    const FEED_URL = 'https://script.google.com/macros/s/AKfycbxT342Zvs3e_sPcoQe1m-jPfeGfOayeS6YVdc1j8Jlyq6vd2OKEqf_LH8Dvr57QH44eqw/exec';      // fx https://script.google.com/macros/s/…/exec
-    const FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSfg4x6cGMv1V821kLQDGjqM-rRMu-TD6AzFZvKZ7BTnTARgrQ/viewform?usp=dialog';             // Tilmeldingsformular
-    const REMOVE_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSfEOyKIBv6Mp76qa0BGFTBSeetSxjQyWOqDx9gN9wje0Sj1Lg/viewform?usp=dialog';       // Fjern/ret-formular
+    // 🔗 LINKS
+    const FEED_URL = 'https://script.google.com/macros/s/AKfycbxT342Zvs3e_sPcoQe1m-jPfeGfOayeS6YVdc1j8Jlyq6vd2OKEqf_LH8Dvr57QH44eqw/exec';
+    const FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSfg4x6cGMv1V821kLQDGjqM-rRMu-TD6AzFZvKZ7BTnTARgrQ/viewform?usp=dialog';
+    const REMOVE_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSfEOyKIBv6Mp76qa0BGFTBSeetSxjQyWOqDx9gN9wje0Sj1Lg/viewform?usp=dialog';
 
-    // 🗺️ Gistrup center og “hegn” (bbox)
-    // BBOX format: [[sydvest_lat, sydvest_lng], [nordøst_lat, nordøst_lng]]
+    // 🗺️ Gistrup-ramme
     const CENTER = [56.9933, 9.9886];
-    const BBOX = [[56.9700, 9.9500], [57.0200, 10.0500]];
+    const BBOX = [[56.9700, 9.9500], [57.0200, 10.0500]]; // bruges kun som "hegn"
 
-    // Init Leaflet-kort
+    // Init Leaflet-kort – start med fast zoom og centrum (ingen auto-fit)
     const map = L.map('map', { worldCopyJump: false }).setView(CENTER, 13);
 
-    // Brug OSM-tiles uden wrap (forhindrer at “gentage verden”)
+    // OSM-tiles uden wrap
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       noWrap: true,
@@ -79,11 +126,11 @@
       attribution: '&copy; OpenStreetMap-bidragsydere'
     }).addTo(map);
 
-    // Lås kortet til BBOX og sæt zoomgrænser
+    // Lås kortet til BBOX og sæt zoomgrænser (uden auto-fit)
     map.setMaxBounds(BBOX);
-    map.fitBounds(BBOX);
-    map.setMinZoom(13);               // fast min-zoom så man ikke kan zoome langt ud
-    map.setMaxZoom(18);               // stadig muligt at zoome tæt ind
+    // *** FJERNET: map.fitBounds(BBOX);  (auto-zoom ved load)
+    map.setMinZoom(13);
+    map.setMaxZoom(18);
     map.options.maxBoundsViscosity = 1;
 
     // Knapper (tilmeld/fjern)
@@ -98,7 +145,7 @@
       options: { className: '', html: '<div class="pumpkin-marker">🎃</div>', iconSize: [28,28], iconAnchor: [14,14], popupAnchor: [0,-14] }
     });
 
-    // JSONP loader for at undgå CORS
+    // JSONP helper (CORS-fri)
     function jsonp(url) {
       return new Promise((resolve, reject) => {
         const cb = 'cb_' + Math.random().toString(36).slice(2);
@@ -110,24 +157,24 @@
           if (script.parentNode) script.parentNode.removeChild(script);
         }
         window[cb] = (data) => { cleanup(); resolve(data); };
-        script.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + cb;
+        script.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + cb + '&cbust=' + Date.now();
         script.onerror = () => { cleanup(); reject(new Error('JSONP load error')); };
         document.body.appendChild(script);
       });
     }
 
-    // Hent markører (GeoJSON) via JSONP
+    // Hent markører (GeoJSON) via JSONP – uden auto-zoom
     async function loadMarkers() {
       try {
         const geo = await jsonp(FEED_URL);
 
+        // ryd gamle lag? (Leaflet geoJSON returnerer et lag – tilføj på map)
         const layer = L.geoJSON(geo, {
           pointToLayer: (feature, latlng) => L.marker(latlng, { icon: new PumpkinIcon() }),
           onEachFeature: (feature, marker) => {
             const p = feature.properties || {};
             const whenRaw = p.tidspunkt && String(p.tidspunkt).trim();
             const whenTxt = whenRaw ? formatWhen(whenRaw) : '';
-            
             const html = `
               <strong>${escapeHtml(p.adresse || 'Adresse')}</strong><br/>
               ${whenTxt ? `⏰ Indtil ${escapeHtml(whenTxt)}<br/>` : ''}
@@ -137,10 +184,11 @@
           }
         }).addTo(map);
 
-        if (geo.features && geo.features.length) {
-          const b = layer.getBounds();
-          if (b.isValid()) map.fitBounds(b.pad(0.2));
-        }
+        // *** FJERNET: auto-fit til features (både ved load og refresh)
+        // if (geo.features && geo.features.length) {
+        //   const b = layer.getBounds();
+        //   if (b.isValid()) map.fitBounds(b.pad(0.2));
+        // }
       } catch (e) {
         console.error(e);
         alert('Kunne ikke hente kortdata (prøv at opdatere siden).');
@@ -148,43 +196,38 @@
     }
 
     function formatWhen(raw) {
-  if (!raw) return '';
-  const s = String(raw).trim();
+      if (!raw) return '';
+      const s = String(raw).trim();
 
-  // 1) ISO-lignende "1899-12-30T21:51:16.000Z" -> tag HH:MM direkte
-  const iso = s.match(/^\d{4}-\d{2}-\d{2}T(\d{2}):(\d{2})(?::\d{2})?Z?$/);
-  if (iso) return `${iso[1]}:${iso[2]}`;
+      const iso = s.match(/^\d{4}-\d{2}-\d{2}T(\d{2}):(\d{2})(?::\d{2})?Z?$/);
+      if (iso) return `${iso[1]}:${iso[2]}`;
 
-  // 2) "21:30" eller "21:30:00"
-  const hhmm = s.match(/^(\d{1,2}):(\d{2})(?::\d{2})?$/);
-  if (hhmm) return `${hhmm[1].padStart(2,'0')}:${hhmm[2]}`;
+      const hhmm = s.match(/^(\d{1,2}):(\d{2})(?::\d{2})?$/);
+      if (hhmm) return `${hhmm[1].padStart(2,'0')}:${hhmm[2]}`;
 
-  // 3) Sheets-time som decimaltal (fraktion af et døgn)
-  const n = Number(s);
-  if (!isNaN(n) && n >= 0 && n < 1) {
-    const total = Math.round(n * 24 * 60);
-    const hh = String(Math.floor(total / 60)).padStart(2,'0');
-    const mm = String(total % 60).padStart(2,'0');
-    return `${hh}:${mm}`;
-  }
+      const n = Number(s);
+      if (!isNaN(n) && n >= 0 && n < 1) {
+        const total = Math.round(n * 24 * 60);
+        const hh = String(Math.floor(total / 60)).padStart(2,'0');
+        const mm = String(total % 60).padStart(2,'0');
+        return `${hh}:${mm}`;
+      }
 
-  // 4) Sidste forsøg: parse som dato og brug UTC-tid (undgår tidszone-forskydning)
-  const d = new Date(s);
-  if (!isNaN(d.getTime())) {
-    const hh = String(d.getUTCHours()).padStart(2,'0');
-    const mm = String(d.getUTCMinutes()).padStart(2,'0');
-    return `${hh}:${mm}`;
-  }
-
-  return s; // fallback: vis som skrevet
-}
+      const d = new Date(s);
+      if (!isNaN(d.getTime())) {
+        const hh = String(d.getUTCHours()).padStart(2,'0');
+        const mm = String(d.getUTCMinutes()).padStart(2,'0');
+        return `${hh}:${mm}`;
+      }
+      return s;
+    }
 
     function escapeHtml(s) {
       return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
     }
 
+    // Første load + auto-refresh
     loadMarkers();
-    // Auto-refresh hver 60. sekund (valgfrit, men rart under tilmeldingsbølger)
     setInterval(loadMarkers, 60000);
 
     // GPS tracking (“Find mig”)
