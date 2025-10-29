@@ -13,7 +13,7 @@
       padding: 10px 12px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
       font-size: 14px; line-height: 1.35; max-width: 320px;
-      .panel { z-index: 1000; }
+      z-index: 1000;
     }
     .panel h1 { margin: 0 0 6px; font-size: 16px; }
     .cta { display:inline-block; background:#ff7a00; color:#fff; padding:6px 10px; border-radius:6px; text-decoration:none; margin-right:6px; margin-top:8px;}
@@ -73,7 +73,8 @@
 
     map.setMaxBounds(BBOX);
     map.fitBounds(BBOX);
-    map.options.minZoom = 12;
+    map.setMinZoom(13);        // forhindrer for meget udzoom
+    map.setMaxZoom(18);        // lader folk zoome tæt ind
     map.options.maxBoundsViscosity = 1;
 
     // Knapper
