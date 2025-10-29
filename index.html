@@ -125,9 +125,12 @@
           pointToLayer: (feature, latlng) => L.marker(latlng, { icon: new PumpkinIcon() }),
           onEachFeature: (feature, marker) => {
             const p = feature.properties || {};
+            const whenRaw = p.tidspunkt && String(p.tidspunkt).trim();
+            const whenTxt = whenRaw ? formatWhen(whenRaw) : '';
+            
             const html = `
               <strong>${escapeHtml(p.adresse || 'Adresse')}</strong><br/>
-              ${p.tidspunkt ? `⏰ ${escapeHtml(p.tidspunkt)}<br/>` : ''}
+              ${whenTxt ? `⏰ Indtil ${escapeHtml(whenTxt)}<br/>` : ''}
               ${p.note ? `📝 ${escapeHtml(p.note)}` : ''}
             `;
             marker.bindPopup(html);
@@ -143,6 +146,38 @@
         alert('Kunne ikke hente kortdata (prøv at opdatere siden).');
       }
     }
+
+    function formatWhen(raw) {
+  if (!raw) return '';
+  const s = String(raw).trim();
+
+  // 1) ISO-lignende "1899-12-30T21:51:16.000Z" -> tag HH:MM direkte
+  const iso = s.match(/^\d{4}-\d{2}-\d{2}T(\d{2}):(\d{2})(?::\d{2})?Z?$/);
+  if (iso) return `${iso[1]}:${iso[2]}`;
+
+  // 2) "21:30" eller "21:30:00"
+  const hhmm = s.match(/^(\d{1,2}):(\d{2})(?::\d{2})?$/);
+  if (hhmm) return `${hhmm[1].padStart(2,'0')}:${hhmm[2]}`;
+
+  // 3) Sheets-time som decimaltal (fraktion af et døgn)
+  const n = Number(s);
+  if (!isNaN(n) && n >= 0 && n < 1) {
+    const total = Math.round(n * 24 * 60);
+    const hh = String(Math.floor(total / 60)).padStart(2,'0');
+    const mm = String(total % 60).padStart(2,'0');
+    return `${hh}:${mm}`;
+  }
+
+  // 4) Sidste forsøg: parse som dato og brug UTC-tid (undgår tidszone-forskydning)
+  const d = new Date(s);
+  if (!isNaN(d.getTime())) {
+    const hh = String(d.getUTCHours()).padStart(2,'0');
+    const mm = String(d.getUTCMinutes()).padStart(2,'0');
+    return `${hh}:${mm}`;
+  }
+
+  return s; // fallback: vis som skrevet
+}
 
     function escapeHtml(s) {
       return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
