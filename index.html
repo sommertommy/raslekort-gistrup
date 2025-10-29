@@ -110,6 +110,55 @@
       outline: none;
       box-shadow: none;
     }
+
+/* ☕️ Coffee FAB */
+.coffee-fab{
+  position: fixed; left:14px; bottom:14px; width:56px; height:56px;
+  border-radius:50%; background:#ff7a00; color:#fff; border:none; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; font-size:26px;
+  box-shadow:0 8px 24px rgba(0,0,0,.25); z-index:1100; user-select:none;
+  transition: background .2s ease, transform .1s ease;
+}
+.coffee-fab:hover{ background:#ff8e2b; transform: translateY(-1px); }
+.coffee-fab:focus{ outline:none; }
+.coffee-fab:focus-visible{ box-shadow:0 0 0 3px rgba(255,122,0,.35); }
+
+/* Modal backdrop */
+.coffee-backdrop[hidden]{ display:none !important; }
+.coffee-backdrop{
+  position:fixed; inset:0; background:rgba(0,0,0,.32); z-index:1200;
+  display:flex; align-items:center; justify-content:center; padding:16px;
+}
+
+/* Selve modal-boksen */
+.coffee-modal{
+  background:#fff; border-radius:14px; box-shadow:0 12px 40px rgba(0,0,0,.22);
+  max-width:360px; width:100%; padding:16px 18px; position:relative;
+  font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+}
+
+/* Luk-knap (kryds) */
+.coffee-close{
+  position:absolute; right:10px; top:8px;
+  border:none; background:transparent; color:#ff7a00; cursor:pointer;
+  font-size:22px; line-height:1; padding:6px; border-radius:8px;
+  transition: background .15s ease, transform .1s ease;
+}
+.coffee-close:hover{ background:#fff3e6; transform: rotate(90deg); }
+.coffee-close:focus{ outline:none; }
+.coffee-close:focus-visible{ box-shadow:0 0 0 3px rgba(255,122,0,.35); }
+
+/* CTA i modal */
+.coffee-cta{
+  display:inline-block; background:#ff7a00; color:#fff; text-decoration:none;
+  padding:10px 14px; border-radius:10px; font-weight:700;
+  box-shadow:0 6px 16px rgba(0,0,0,.18);
+}
+.coffee-cta:hover{ background:#ff8e2b; }
+
+/* Valgfrit: skjul “Find mig” når panelet er åbent */
+body.panel-open #locateBtn{ display:none; }
+
     
   </style>
 </head>
@@ -135,12 +184,27 @@
 
   <!-- FAB (vises når panelet er minimeret) -->
   <button id="fab" class="fab" aria-label="Åbn panel">+</button>
-
+    <!-- ☕️ Flydende knap -->
+  <button id="coffeeFab" class="coffee-fab" aria-haspopup="dialog" aria-controls="coffeeModal" title="Støt projektet">☕️</button>
+  
+  <!-- ☕️ Popup (modal) -->
+  <div id="coffeeBackdrop" class="coffee-backdrop" role="presentation" hidden>
+    <div id="coffeeModal" class="coffee-modal" role="dialog" aria-modal="true" aria-labelledby="coffeeTitle">
+      <button class="coffee-close" id="coffeeClose" aria-label="Luk">×</button>
+      <h2 id="coffeeTitle" style="margin:0 0 8px; font-size:16px;">Støt projektet</h2>
+      <p style="margin:0 0 14px;">
+        Støt raslekortet og mennesket bag denne hjemmeside. Tusind tak 🙏
+      </p>
+      <a class="coffee-cta" target="_blank" rel="noopener"
+         href="https://qr.mobilepay.dk/box/ea6aeeaf-bdaa-4c7f-b0f9-a4d5bb623ce8/pay-in">
+        Giv en kop kaffe →
+      </a>
+    </div>
+  </div>
   <!-- “Find mig” -->
   <button id="locateBtn" class="locate-btn">📍 Find mig</button>
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="sommertommy" data-description="Support me on Buy me a coffee!" data-message="Tusind tak! <3 " data-color="#5F7FFF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
   
   <script>
     // 🔗 LINKS
@@ -166,6 +230,32 @@
     map.setMaxZoom(18);
     map.options.maxBoundsViscosity = 1;
 
+  // ☕️ Coffee modal logic
+const coffeeFab = document.getElementById('coffeeFab');
+const coffeeBackdrop = document.getElementById('coffeeBackdrop');
+const coffeeClose = document.getElementById('coffeeClose');
+const coffeeModal = document.getElementById('coffeeModal');
+
+function openCoffee(){
+  coffeeBackdrop.removeAttribute('hidden');
+  // Valgfrit: skjul “Find mig” mens popup er åben
+  document.body.classList.add('panel-open');
+  // fokus på luk-knap for keyboard
+  coffeeClose.focus();
+}
+function closeCoffee(){
+  coffeeBackdrop.setAttribute('hidden','');
+  document.body.classList.remove('panel-open');
+  coffeeFab.focus();
+}
+
+coffeeFab.addEventListener('click', openCoffee);
+coffeeClose.addEventListener('click', closeCoffee);
+// klik udenfor boksen lukker
+coffeeBackdrop.addEventListener('click', (e)=>{ if(e.target === coffeeBackdrop) closeCoffee(); });
+// ESC lukker
+document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape' && !coffeeBackdrop.hasAttribute('hidden')) closeCoffee(); });
+    
     // Knapper i panelet
     const btns = document.getElementById('btns');
     btns.innerHTML = [
