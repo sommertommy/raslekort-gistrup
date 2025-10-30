@@ -110,34 +110,34 @@
       outline: none;
       box-shadow: none;
     }
-
 /* ☕️ Coffee FAB */
 .coffee-fab {
-    position: fixed;
-    right: 18px;
-    top: 104px;
-    width: 46px;
-    height: 46px;
-    border-radius: 50%;
-    background: #523749;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-    display: flex
-    isolation: isolate; /* giver et eget stacking-context, så ::before kan ligge "under" */
-;
-    align-items: center;
-    justify-content: center;
-    font-size: 26px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, .25);
-    z-index: 1100;
-    user-select: none;
-    transition: background .2s ease, transform .1s ease;
+  position: fixed;
+  right: 18px;
+  top: 104px;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: #523749;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .25);
+  z-index: 1100;
+  user-select: none;
+  transition: background .2s ease, transform .1s ease;
+  isolation: isolate; /* eget stacking-context, så ::before/::after kan ligge under knappen */
 }
-.coffee-fab:hover{ background:#ff8e2b; transform: translateY(-1px); }
-.coffee-fab:focus{ outline:none; }
-.coffee-fab:focus-visible{ box-shadow:0 0 0 3px rgba(255,122,0,.35); }
 
+.coffee-fab:hover { background:#ff8e2b; transform: translateY(-1px); }
+.coffee-fab:focus { outline:none; }
+.coffee-fab:focus-visible { box-shadow:0 0 0 3px rgba(255,122,0,.35); }
+
+/* 🔵 Puls-effekt – 1 puls og derefter pause, samlet hver 5s */
 .coffee-fab::before {
   content: "";
   position: absolute;
@@ -149,36 +149,36 @@
   filter: blur(3px);
   z-index: -1; 
   pointer-events: none;
-  animation: coffeePulseGlow 2.2s ease-out infinite;
+  animation: coffeePulseGlow 5s ease-out infinite;
 }
 
-    .coffee-fab::after {
+.coffee-fab::after {
   content: "";
   position: absolute;
   left: 50%; top: 50%;
   width: 100%; height: 100%;
   transform: translate(-50%, -50%) scale(1);
   border-radius: 50%;
-  box-shadow: 0 0 0 2px rgba(0,123,255,0.35); /* ringens farve/styrke */
+  box-shadow: 0 0 0 2px rgba(0,123,255,0.35);
   background: transparent;
   z-index: -1;
   pointer-events: none;
-  animation: coffeePulseRing 2.2s ease-out infinite;
-  animation-delay: .8s; /* forskyder ring-pulsen en smule */
+  animation: coffeePulseRing 5s ease-out infinite;
+  animation-delay: .6s; /* ring følger lidt efter gløden */
 }
 
-/* Glød-animation (mere fylde) */
+/* Glød-animation (hurtig ping → lang pause) */
 @keyframes coffeePulseGlow {
-  0%   { transform: translate(-50%, -50%) scale(1);    opacity: .55; }
-  60%  { transform: translate(-50%, -50%) scale(1.9);  opacity: 0;   }
-  100% { transform: translate(-50%, -50%) scale(1.9);  opacity: 0;   }
+  0%   { transform: translate(-50%, -50%) scale(1);    opacity: .6; }
+  20%  { transform: translate(-50%, -50%) scale(1.8);  opacity: 0;  } /* selve pulsen er ca. første 1s */
+  100% { transform: translate(-50%, -50%) scale(1.8);  opacity: 0;  } /* pause frem til 5s */
 }
 
-/* Ring-animation (tydelig outline-ping) */
+/* Ring-animation (tydelig outline-ping → pause) */
 @keyframes coffeePulseRing {
   0%   { transform: translate(-50%, -50%) scale(1);    opacity: .6; }
-  70%  { transform: translate(-50%, -50%) scale(2.2);  opacity: 0;  }
-  100% { transform: translate(-50%, -50%) scale(2.2);  opacity: 0;  }
+  25%  { transform: translate(-50%, -50%) scale(2.1);  opacity: 0;  } /* ring varer lidt længere */
+  100% { transform: translate(-50%, -50%) scale(2.1);  opacity: 0;  }
 }
 
 /* Respektér “reduce motion” */
@@ -186,7 +186,7 @@
   .coffee-fab::before,
   .coffee-fab::after { animation: none; opacity: .25; }
 }
-    
+
 /* Modal backdrop */
 .coffee-backdrop[hidden]{ display:none !important; }
 .coffee-backdrop{
