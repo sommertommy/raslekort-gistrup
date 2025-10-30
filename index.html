@@ -124,6 +124,7 @@
     border: none;
     cursor: pointer;
     display: flex
+    isolation: isolate; /* giver et eget stacking-context, så ::before kan ligge "under" */
 ;
     align-items: center;
     justify-content: center;
@@ -137,6 +138,35 @@
 .coffee-fab:focus{ outline:none; }
 .coffee-fab:focus-visible{ box-shadow:0 0 0 3px rgba(255,122,0,.35); }
 
+.coffee-fab::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%) scale(1);
+  border-radius: 50%;
+  /* svag blå glød der fader ud */
+  background: radial-gradient(closest-side, rgba(0,123,255,0.22), rgba(0,123,255,0) 70%);
+  filter: blur(2px);
+  z-index: -1;          /* under selve knappen */
+  pointer-events: none; /* må ikke fange klik */
+  animation: coffeePulse 2.8s ease-out infinite;
+}
+
+@keyframes coffeePulse {
+  0%   { transform: translate(-50%, -50%) scale(1);   opacity: .55; }
+  60%  { transform: translate(-50%, -50%) scale(1.45); opacity: 0; }
+  100% { transform: translate(-50%, -50%) scale(1.45); opacity: 0; }
+}
+
+/* Respektér brugere der ikke ønsker animationer */
+@media (prefers-reduced-motion: reduce) {
+  .coffee-fab::before { animation: none; opacity: .25; }
+}
+
+    
 /* Modal backdrop */
 .coffee-backdrop[hidden]{ display:none !important; }
 .coffee-backdrop{
