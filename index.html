@@ -141,31 +141,51 @@
 .coffee-fab::before {
   content: "";
   position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 100%;
-  height: 100%;
+  left: 50%; top: 50%;
+  width: 100%; height: 100%;
   transform: translate(-50%, -50%) scale(1);
   border-radius: 50%;
-  /* svag blå glød der fader ud */
-  background: radial-gradient(closest-side, rgba(0,123,255,0.22), rgba(0,123,255,0) 70%);
-  filter: blur(2px);
-  z-index: -1;          /* under selve knappen */
-  pointer-events: none; /* må ikke fange klik */
-  animation: coffeePulse 2.8s ease-out infinite;
+  background: radial-gradient(closest-side, rgba(0,123,255,0.30), rgba(0,123,255,0) 70%);
+  filter: blur(3px);
+  z-index: -1; 
+  pointer-events: none;
+  animation: coffeePulseGlow 2.2s ease-out infinite;
 }
 
-@keyframes coffeePulse {
-  0%   { transform: translate(-50%, -50%) scale(1);   opacity: .55; }
-  60%  { transform: translate(-50%, -50%) scale(1.45); opacity: 0; }
-  100% { transform: translate(-50%, -50%) scale(1.45); opacity: 0; }
+    .coffee-fab::after {
+  content: "";
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 100%; height: 100%;
+  transform: translate(-50%, -50%) scale(1);
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(0,123,255,0.35); /* ringens farve/styrke */
+  background: transparent;
+  z-index: -1;
+  pointer-events: none;
+  animation: coffeePulseRing 2.2s ease-out infinite;
+  animation-delay: .8s; /* forskyder ring-pulsen en smule */
 }
 
-/* Respektér brugere der ikke ønsker animationer */
+/* Glød-animation (mere fylde) */
+@keyframes coffeePulseGlow {
+  0%   { transform: translate(-50%, -50%) scale(1);    opacity: .55; }
+  60%  { transform: translate(-50%, -50%) scale(1.9);  opacity: 0;   }
+  100% { transform: translate(-50%, -50%) scale(1.9);  opacity: 0;   }
+}
+
+/* Ring-animation (tydelig outline-ping) */
+@keyframes coffeePulseRing {
+  0%   { transform: translate(-50%, -50%) scale(1);    opacity: .6; }
+  70%  { transform: translate(-50%, -50%) scale(2.2);  opacity: 0;  }
+  100% { transform: translate(-50%, -50%) scale(2.2);  opacity: 0;  }
+}
+
+/* Respektér “reduce motion” */
 @media (prefers-reduced-motion: reduce) {
-  .coffee-fab::before { animation: none; opacity: .25; }
+  .coffee-fab::before,
+  .coffee-fab::after { animation: none; opacity: .25; }
 }
-
     
 /* Modal backdrop */
 .coffee-backdrop[hidden]{ display:none !important; }
